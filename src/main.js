@@ -2,27 +2,25 @@ const gridSize = 20
 
 function main () {
   const canvas = document.getElementById('output')
-  canvas.width = 600
-  canvas.height = 600
+  canvas.width = 900
+  canvas.height = 900
 
   const context = canvas.getContext('2d')
 
   const wave = []
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
-      wave[i * gridSize + j] = ['L', 'S', 'C', 'M', 'O', 'T']
-    }
+  for (let i = 0; i < gridSize * gridSize; i++) {
+    wave[i] = ['L', 'S', 'C', 'M', 'O', 'T']
   }
 
-  for (let i = 0; i < 400; i++) {
+  setInterval(() => {
     const selected = selectAndCollapse(wave)
     if (selected < 0) {
-      break
+      return
     }
     propagate(selected, wave)
-  }
 
-  display(context, wave)
+    display(context, wave)
+  }, 20)
 }
 
 function displayColor (poss) {
@@ -164,27 +162,34 @@ function propagate (selected, wave) {
 }
 
 function neighbours (idx) {
-  const i = Math.floor(idx / gridSize)
-  const j = idx % gridSize
+  const [i, j] = fromIndex(idx)
 
   const result = []
   if (i > 0) {
-    result.push(gridSize * (i - 1) + j)
+    result.push(toIndex(i - 1, j))
   }
   if (i < gridSize - 1) {
-    result.push(gridSize * (i + 1) + j)
+    result.push(toIndex(i + 1, j))
   }
   if (j > 0) {
-    result.push(gridSize * i + j - 1)
+    result.push(toIndex(i, j - 1))
   }
   if (j < gridSize - 1) {
-    result.push(gridSize * i + j + 1)
+    result.push(toIndex(i, j + 1))
   }
 
   return result
 }
 
-window.neighbours = neighbours
+function toIndex (x, y) {
+  return x * gridSize + y
+}
+
+function fromIndex (index) {
+  const x = Math.floor(index / gridSize)
+  const y = index % gridSize
+  return [x, y]
+}
 
 function choice (items) {
   const idx = Math.floor(items.length * Math.random())
