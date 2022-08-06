@@ -2,15 +2,15 @@ const gridSize = 20
 
 function main () {
   const canvas = document.getElementById('output')
-  canvas.width = 400
-  canvas.height = 400
+  canvas.width = 600
+  canvas.height = 600
 
   const context = canvas.getContext('2d')
 
   const wave = []
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      wave[i * gridSize + j] = ['L', 'S', 'C', 'M', 'O']
+      wave[i * gridSize + j] = ['L', 'S', 'C', 'M', 'O', 'T']
     }
   }
 
@@ -46,14 +46,19 @@ function displayColor (poss) {
       b = b / 2
     }
     if (item === 'M') {
-      r = (64 + r) / 2
-      g = (64 + g) / 2
-      b = (64 + b) / 2
+      r = (200 + r) / 2
+      g = (200 + g) / 2
+      b = (200 + b) / 2
     }
     if (item === 'O') {
       r = (0 + r) / 2
       g = (0 + g) / 2
       b = (128 + b) / 2
+    }
+    if (item === 'T') {
+      r = (255 + r) / 2
+      g = (255 + g) / 2
+      b = (255 + b) / 2
     }
   }
   return `rgb(${r}, ${g}, ${b})`
@@ -63,7 +68,7 @@ function display (context, wave) {
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       context.fillStyle = displayColor(wave[i * gridSize + j])
-      context.fillRect(i * 20, j * 20, 19, 19)
+      context.fillRect(i * 30, j * 30, 29, 29)
     }
   }
 }
@@ -124,6 +129,10 @@ function propagate (selected, wave) {
         allowed.add('L')
       } else if (item === 'M') {
         allowed.add('L')
+        allowed.add('M')
+        allowed.add('T')
+      } else if (item === 'T') {
+        allowed.add('M')
       } else if (item === 'O') {
         allowed.add('O')
         allowed.add('S')
