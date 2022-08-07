@@ -1,6 +1,82 @@
-const gridSize = 20
+const gridSize = 30
+
+const SAMPLE = [
+  ' A  ',
+  'AAAA',
+  '   A',
+  '   A'
+]
+
+function extractTiles () {
+  console.log('samel')
+  const canvas = document.getElementById('tiles')
+  canvas.width = 400
+  canvas.height = 400
+  const context = canvas.getContext('2d')
+
+  const tiles = []
+  for (let i = 0; i < SAMPLE.length; i++) {
+    for (let j = 0; j < SAMPLE[0].length; j++) {
+      const pixels = []
+      for (let y = 0; y < 3; y++) {
+        for (let x = 0; x < 3; x++) {
+          const value = SAMPLE[(i + y) % SAMPLE.length][(j + x) % SAMPLE[0].length]
+          pixels.push(value)
+          if (value === 'A') {
+            context.fillStyle = 'black'
+          } else {
+            context.fillStyle = '#ccccff'
+          }
+          context.fillRect(i * 40 + 10 * y, j * 40 + 10 * x, 9, 9)
+        }
+      }
+      tiles.push(pixels.join(''))
+    }
+  }
+  return tiles
+}
+
+const Up = 'Up'
+const Down = 'Down'
+const Left = 'Left'
+const Right = 'Right'
+
+function allowedAdjacent (tile1, tile2, direction) {
+  if (direction === Right) {
+    let result = true
+    for (let i = 0; i < 3; i++) {
+      result &&= tile1[3 * i + 1] === tile2[3 * i] && tile1[3 * i + 2] === tile2[3 * i + 1]
+    }
+    return result
+  } else if (direction === Left) {
+    return allowedAdjacent(tile2, tile1, Right)
+  } else
+  if (direction === Down) {
+    let result = true
+    for (let i = 0; i < 3; i++) {
+      result &&= tile1[3 + i] === tile2[0 + i] && tile1[6 + i] === tile2[3 + i]
+    }
+    return result
+  } else if (direction === Up) {
+    return allowedAdjacent(tile2, tile1, Down)
+  }
+}
 
 function main () {
+  const tiles = extractTiles()
+
+  for (const tile1 of tiles) {
+    for (const tile2 of tiles) {
+      for (const direction of [Up, Down, Left, Right]) {
+        const allowed = allowedAdjacent(tile1, tile2, direction)
+        if (allowed) {
+          console.log(tile1, tile2, direction)
+        }
+      }
+    }
+  }
+
+  return
   const canvas = document.getElementById('output')
   canvas.width = 900
   canvas.height = 900
