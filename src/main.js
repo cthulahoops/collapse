@@ -157,12 +157,12 @@ function displayTile (context, x, y, tile) {
 
 export function displayTiles (tiles) {
   const canvas = document.getElementById('tiles')
-  canvas.width = 200
+  canvas.width = 400
   canvas.height = 1000
   const context = canvas.getContext('2d')
   console.log('There are: ', tiles.length)
   for (let i = 0; i < tiles.length; i++) {
-    displayTile(context, 40 * (i % 5), 40 * Math.floor(i / 5), tiles[i])
+    displayTile(context, 40 * (i % 10), 40 * Math.floor(i / 10), tiles[i])
   }
 }
 
