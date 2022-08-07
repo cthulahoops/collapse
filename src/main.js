@@ -301,30 +301,23 @@ function display (context, wave, tiles) {
 
 function selectAndCollapse (wave) {
   let bestScore = 500
-  let bestCandidates = []
+  let best
   for (let idx = 0; idx < wave.length; idx++) {
     const possibilities = wave[idx]
-    const score = possibilities.entropy()
-    if (score === 0) {
+    const score = possibilities.entropy() + Math.random()
+    if (score < 2) {
       continue
-    }
-    if (score === 1) {
-      continue
-    } else if (score === bestScore) {
-      bestCandidates.push(idx)
-    } else if (score < bestScore) {
-      bestCandidates = [idx]
-      bestScore = possibilities.entropy()
+    } else if (score + Math.random() < bestScore) {
+      best = idx
+      bestScore = score
     }
   }
   if (bestScore === 500) {
     return -1
   }
 
-  const selected = choice(bestCandidates)
-
-  wave[selected].collapse()
-  return selected
+  wave[best].collapse()
+  return best
 }
 
 function propagate (selected, wave, rules) {
