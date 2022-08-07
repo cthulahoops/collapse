@@ -1,9 +1,10 @@
-const gridSize = 10
+const gridSize = 30
 
 function main () {
   const tiles = extractTiles()
-  displayTiles(tiles)
   const rules = buildRules(tiles)
+
+  displayTiles(tiles)
 
   const canvas = document.getElementById('output')
   canvas.width = 900
@@ -16,8 +17,8 @@ function main () {
     wave[i] = new Superposition(tiles)
   }
 
-  //  setInterval(() => {
-  for (let i = 0; i < 100; i++) {
+  setInterval(() => {
+  // for (let i = 0; i < 14; i++) {
     const selected = selectAndCollapse(wave)
     if (selected < 0) {
       return
@@ -25,16 +26,101 @@ function main () {
 
     propagate(selected, wave, rules)
     display(context, wave, tiles)
-  }
-  // }, 1000)
+  // }
+  }, 10)
+  // canvas.addEventListener('mousemove', (event) => {
+  //   const j = Math.floor((event.clientX - canvas.offsetLeft) / 30)
+  //   const i = Math.floor((event.clientY - canvas.offsetTop + window.pageYOffset) / 30)
+  //   if (i > gridSize || j > gridSize) {
+  //     return
+  //   }
+  //   displaySuperposition(wave[toIndex(i, j)], tiles)
+  // })
+}
+
+const COLORS = {
+  Y: { r: 255, g: 255, b: 0 },
+  G: { r: 0, g: 255, b: 0 },
+  B: { r: 0, g: 0, b: 255 },
+  R: { r: 255, g: 0, b: 0 },
+  K: { r: 0, g: 0, b: 0 },
+  C: { r: 0, g: 255, b: 255 },
+  7: { r: 128, g: 128, b: 128 },
+  W: { r: 255, g: 255, b: 255 }
 }
 
 const SAMPLE = [
-  ' A  ',
-  ' A  ',
-  ' A  ',
-  ' A  '
+  'BBBBBBBBBBBBBBBBBBBBBB',
+  'BBBBBBBBBBBBBBBBBBBBBB',
+  'BBBBBBYYYYYYYBBBBBBBBB',
+  'BBBBBBYGGYGGGYBBBBBBBB',
+  'BBBBBYGGGGGGGGYBBBBBBB',
+  'BBBYYYGGGGGGGGYBBBBBBB',
+  'BBBYGGGG777GGGYBBBBBBB',
+  'BBBYGGG77W77GGYBBBBBBB',
+  'BBBYGG77W77GGGYBBBBBBB',
+  'BBBYGGG777GGGGYBBBBBBB',
+  'BBBYGGGGGGGGGGYBBBBBBB',
+  'BBBYGGGGGYYGYYYBBBBBBB',
+  'BBBBYGYYYBYGYBBBBBBBBB',
+  'BBBBBYBBBBYYBBBBBBBBBB',
+  'BBBBBBBBBBBBBBBBBBBBBB',
+  'BBBBBBBBBBBBBBBBBBBBBB',
+  'BBBBBBBBBBBBBBBBBBBBBB'
 ]
+
+// const SAMPLE = [
+//   'KKKK KKKKKKKKKK KKKKKK',
+//   'KKKK KKKKKKKKKK KKKKKK',
+//   'KKKK    KKKK       KKK',
+//   '              BB      ',
+//   'KKK     KKKK  BB   KKK',
+//   'KKK     KKKK  BB   KKK',
+//   'KKKK KKKKKKK       KKK',
+//   'KKKK KKKYRKKKKK KKKKKK',
+//   'KKKK KKKYKKKKKK KKKKKK'
+// ]
+
+function uniq (list) {
+  return Array.from(new Set(list))
+}
+
+function flipHorizonally (tile) {
+  const result = []
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      result.push(tile[3 * i + (2 - j)])
+    }
+  }
+  return result.join('')
+}
+
+function flipVertically (tile) {
+  const result = []
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      result.push(tile[3 * (2 - i) + j])
+    }
+  }
+  return result.join('')
+}
+
+function rotate (tile) {
+  const result = []
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      result.push(tile[3 * j + i])
+    }
+  }
+  return result.join('')
+}
+
+function rotateAndReflect (tiles) {
+  tiles = tiles.concat(tiles.map(flipHorizonally))
+  tiles = tiles.concat(tiles.map(flipVertically))
+  tiles = tiles.concat(tiles.map(rotate))
+  return tiles
+}
 
 function extractTiles () {
   const tiles = []
@@ -50,26 +136,62 @@ function extractTiles () {
       tiles.push(pixels.join(''))
     }
   }
-  return Array.from(new Set(tiles))
+
+  return uniq(rotateAndReflect(tiles))
 }
 
-function displayTiles (tiles) {
+function displayTile (context, x, y, tile) {
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      const value = tile[3 * i + j]
+      const color = COLORS[value]
+      if (color) {
+        context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
+      } else {
+        context.fillStyle = '#ccccff'
+      }
+      context.fillRect(x + 10 * j, y + 10 * i, 9, 9)
+    }
+  }
+}
+
+export function displayTiles (tiles) {
+  const canvas = document.getElementById('tiles')
+  canvas.width = 200
+  canvas.height = 1000
+  const context = canvas.getContext('2d')
+  console.log('There are: ', tiles.length)
+  for (let i = 0; i < tiles.length; i++) {
+    displayTile(context, 40 * (i % 5), 40 * Math.floor(i / 5), tiles[i])
+  }
+}
+
+function displayRules (rules, tiles) {
   const canvas = document.getElementById('tiles')
   canvas.width = 400
-  canvas.height = 400
+  canvas.height = 700
   const context = canvas.getContext('2d')
-  for (let i = 0; i < tiles.length; i++) {
-    for (let x = 0; x < 3; x++) {
-      for (let y = 0; y < 3; y++) {
-        const value = tiles[i][y * 3 + x]
-        if (value === 'A') {
-          context.fillStyle = 'black'
-        } else {
-          context.fillStyle = '#ccccff'
-        }
-        context.fillRect(i * 40 + 10 * x, 10 * y, 9, 9)
+  let y = 0
+  for (let i = 0; i < rules.length; i++) {
+    for (const direction of [Up, Down, Left, Right]) {
+      displayTile(context, 0, y, tiles[i])
+      let x = 60
+      for (const t2 of rules[i].get(direction)) {
+        displayTile(context, x, y, tiles[t2])
+        x += 40
       }
+      y += 40
     }
+  }
+}
+
+function displaySuperposition (sp, tiles) {
+  const canvas = document.getElementById('super')
+  canvas.width = 400
+  canvas.height = 700
+  const context = canvas.getContext('2d')
+  for (let i = 0; i < sp.values.length; i++) {
+    displayTile(context, 40 * i, 0, tiles[sp.values[i]])
   }
 }
 
@@ -143,10 +265,18 @@ function displayColor (poss, tiles) {
   let r = 0
   let g = 0
   let b = 0
+  if (poss.values.length === 0) {
+    return 'red'
+  }
   for (const item of poss.values) {
-    if (tiles[item][0] === 'A') {
-      r += 255
-      g += 255
+    const color = COLORS[tiles[item][4]]
+    if (color) {
+      r += color.r
+      g += color.g
+      b += color.b
+    } else {
+      r += 200
+      g += 200
       b += 255
     }
   }
@@ -160,7 +290,11 @@ function display (context, wave, tiles) {
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       context.fillStyle = displayColor(wave[i * gridSize + j], tiles)
-      context.fillRect(i * 30, j * 30, 29, 29)
+      if (wave[i * gridSize + j].values.length === 1) {
+        context.strokeStyle = 'blue'
+        context.strokeRect(j * 30, i * 30, 29, 29)
+      }
+      context.fillRect(j * 30, i * 30, 29, 29)
     }
   }
 }
@@ -196,9 +330,7 @@ function selectAndCollapse (wave) {
 function propagate (selected, wave, rules) {
   const changed = [selected]
 
-  let count = 0
-  while (changed.length > 0 && count < 30) {
-    count++
+  while (changed.length > 0) {
     const selected = changed.pop()
     // console.log('Changed: ', selected)
     const values = wave[selected].values
@@ -242,6 +374,8 @@ function getNeighbour (index, direction) {
     return toIndex(i, (j + 1) % gridSize)
   }
 }
+
+window.getNeighbour = getNeighbour
 
 function neighbours (idx) {
   const [i, j] = fromIndex(idx)
