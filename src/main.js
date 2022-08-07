@@ -62,6 +62,24 @@ function allowedAdjacent (tile1, tile2, direction) {
   }
 }
 
+class Superposition {
+  constructor () {
+    this.values = ['L', 'S', 'C', 'M', 'O', 'T']
+  }
+
+  entropy () {
+    return this.values.length
+  }
+
+  intersection (allowed) {
+    this.values = this.values.filter((x) => allowed.has(x))
+  }
+
+  collapse () {
+    this.values = [choice(this.values)]
+  }
+}
+
 function main () {
   const tiles = extractTiles()
 
@@ -70,13 +88,12 @@ function main () {
       for (const direction of [Up, Down, Left, Right]) {
         const allowed = allowedAdjacent(tile1, tile2, direction)
         if (allowed) {
-          console.log(tile1, tile2, direction)
+          // console.log(tile1, tile2, direction)
         }
       }
     }
   }
 
-  return
   const canvas = document.getElementById('output')
   canvas.width = 900
   canvas.height = 900
@@ -85,7 +102,7 @@ function main () {
 
   const wave = []
   for (let i = 0; i < gridSize * gridSize; i++) {
-    wave[i] = ['L', 'S', 'C', 'M', 'O', 'T']
+    wave[i] = new Superposition()
   }
 
   setInterval(() => {
@@ -103,7 +120,7 @@ function displayColor (poss) {
   let r = 128
   let g = 128
   let b = 128
-  for (const item of poss) {
+  for (const item of poss.values) {
     if (item === 'L') {
       r = r / 2
       g = (g + 255) / 2
@@ -152,28 +169,23 @@ function selectAndCollapse (wave) {
   let bestCandidates = []
   for (let idx = 0; idx < wave.length; idx++) {
     const possibilities = wave[idx]
-    const score = possibilities.length
+    const score = possibilities.entropy()
     if (score === 1) {
       continue
     } else if (score === bestScore) {
       bestCandidates.push(idx)
     } else if (score < bestScore) {
       bestCandidates = [idx]
-      bestScore = possibilities.length
+      bestScore = possibilities.entropy()
     }
   }
   if (bestScore === 500) {
     return -1
   }
 
-  console.log('Best candidates ', bestCandidates)
-
   const selected = choice(bestCandidates)
-  const chosenValue = choice(wave[selected])
 
-  console.log('Force collapse: ', selected, wave[selected], ' to ', chosenValue)
-
-  wave[selected] = [chosenValue]
+  wave[selected].collapse()
   return selected
 }
 
@@ -185,7 +197,7 @@ function propagate (selected, wave) {
     count++
     const selected = changed.pop()
     console.log('Changed: ', selected)
-    const values = wave[selected]
+    const values = wave[selected].values
 
     const allowed = new Set()
     for (const item of values) {
@@ -221,16 +233,10 @@ function propagate (selected, wave) {
     }
 
     for (const idx of neighbours(selected)) {
-      const updated = []
       const possibilities = wave[idx]
-      for (const poss of possibilities) {
-        if (allowed.has(poss)) {
-          updated.push(poss)
-        }
-      }
-      if (possibilities.length !== updated.length) {
-        console.log(`Changed ${idx} from ${possibilities} -> ${updated}`)
-        wave[idx] = updated
+      const oldEntropy = possibilities.entropy()
+      possibilities.intersection(allowed)
+      if (possibilities.entropy() !== oldEntropy) {
         changed.push(idx)
       }
     }
