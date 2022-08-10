@@ -18,9 +18,11 @@ function main () {
   for (let i = 0; i < tiles.length; i++) {
     ids.push(i)
   }
+  const superposition = new Superposition(ids)
+
   const wave = []
   for (let i = 0; i < gridSize * gridSize; i++) {
-    wave[i] = new Superposition(ids)
+    wave[i] = superposition
   }
 
   setInterval(() => {
