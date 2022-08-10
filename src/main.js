@@ -355,28 +355,6 @@ function getNeighbour (index, direction) {
   }
 }
 
-window.getNeighbour = getNeighbour
-
-function neighbours (idx) {
-  const [i, j] = fromIndex(idx)
-
-  const result = []
-  if (i > 0) {
-    result.push(toIndex(i - 1, j))
-  }
-  if (i < gridSize - 1) {
-    result.push(toIndex(i + 1, j))
-  }
-  if (j > 0) {
-    result.push(toIndex(i, j - 1))
-  }
-  if (j < gridSize - 1) {
-    result.push(toIndex(i, j + 1))
-  }
-
-  return result
-}
-
 function toIndex (x, y) {
   return x * gridSize + y
 }
@@ -385,11 +363,6 @@ function fromIndex (index) {
   const x = Math.floor(index / gridSize)
   const y = index % gridSize
   return [x, y]
-}
-
-function choice (items) {
-  const idx = Math.floor(items.length * Math.random())
-  return items[idx]
 }
 
 main()
