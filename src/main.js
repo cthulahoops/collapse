@@ -1,3 +1,5 @@
+import { Superposition } from './superposition.js'
+
 const gridSize = 30
 
 function main () {
@@ -238,27 +240,6 @@ function buildRules (tiles) {
   }
 
   return rules
-}
-
-class Superposition {
-  constructor (tiles) {
-    this.values = []
-    for (let i = 0; i < tiles.length; i++) {
-      this.values.push(i)
-    }
-  }
-
-  entropy () {
-    return this.values.length
-  }
-
-  intersection (allowed) {
-    this.values = this.values.filter((x) => allowed.has(x))
-  }
-
-  collapse () {
-    this.values = [choice(this.values)]
-  }
 }
 
 function displayColor (poss, tiles) {
