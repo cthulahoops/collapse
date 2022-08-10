@@ -1,9 +1,6 @@
 export class Superposition {
-  constructor (tiles) {
-    this.values = []
-    for (let i = 0; i < tiles.length; i++) {
-      this.values.push(i)
-    }
+  constructor (values) {
+    this.values = values
   }
 
   entropy () {
@@ -15,7 +12,7 @@ export class Superposition {
   }
 
   collapse () {
-    this.values = [choice(this.values)]
+    return new Superposition([choice(this.values)])
   }
 }
 

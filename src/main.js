@@ -14,9 +14,13 @@ function main () {
 
   const context = canvas.getContext('2d')
 
+  const ids = []
+  for (let i = 0; i < tiles.length; i++) {
+    ids.push(i)
+  }
   const wave = []
   for (let i = 0; i < gridSize * gridSize; i++) {
-    wave[i] = new Superposition(tiles)
+    wave[i] = new Superposition(ids)
   }
 
   setInterval(() => {
@@ -297,7 +301,7 @@ function selectAndCollapse (wave) {
     return -1
   }
 
-  wave[best].collapse()
+  wave[best] = wave[best].collapse()
   return best
 }
 
