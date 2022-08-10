@@ -329,9 +329,9 @@ function propagate (selected, wave, rules) {
 
       const neighbour = getNeighbour(selected, direction)
       const possibilities = wave[neighbour]
-      const oldEntropy = possibilities.entropy()
-      possibilities.intersection(allowed)
-      if (possibilities.entropy() !== oldEntropy) {
+      const newPossibilities = possibilities.intersection(allowed)
+      if (newPossibilities.entropy() !== possibilities.entropy()) {
+        wave[neighbour] = newPossibilities
         // console.log(neighbour, ' -> ', possibilities)
         changed.push(neighbour)
       }

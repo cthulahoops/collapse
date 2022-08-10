@@ -8,7 +8,7 @@ export class Superposition {
   }
 
   intersection (allowed) {
-    this.values = this.values.filter((x) => allowed.has(x))
+    return new Superposition(this.values.filter((x) => allowed.has(x)))
   }
 
   collapse () {
