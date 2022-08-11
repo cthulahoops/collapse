@@ -43,8 +43,10 @@ export function buildRules (tiles) {
 
 export function combineAllowed (rules, tiles, direction) {
   const allowed = new Allowed()
-  for (const tile1 of tiles) {
-    allowed.union(rules[tile1].get(direction))
+  for (let i = 0; i < rules.length; i++) {
+    if (tiles.has(i)) {
+      allowed.union(rules[i].get(direction))
+    }
   }
   return allowed
 }

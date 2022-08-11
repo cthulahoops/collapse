@@ -1,6 +1,8 @@
 import { Superposition } from './superposition.js'
 import { combineAllowed, buildRules, Up, Down, Left, Right } from './allowed.js'
 
+window.Superposition = Superposition
+
 const gridSize = 30
 
 function main () {
@@ -19,7 +21,7 @@ function main () {
   for (let i = 0; i < tiles.length; i++) {
     ids.push(i)
   }
-  const superposition = new Superposition(ids)
+  const superposition = Superposition.fromItems(ids)
 
   const wave = []
   for (let i = 0; i < gridSize * gridSize; i++) {
@@ -194,25 +196,16 @@ function displayRules (rules, tiles) {
   }
 }
 
-function displaySuperposition (sp, tiles) {
-  const canvas = document.getElementById('super')
-  canvas.width = 400
-  canvas.height = 700
-  const context = canvas.getContext('2d')
-  for (let i = 0; i < sp.values.length; i++) {
-    displayTile(context, 40 * i, 0, tiles[sp.values[i]])
-  }
-}
-
 function displayColor (poss, tiles) {
   let r = 0
   let g = 0
   let b = 0
-  if (poss.values.length === 0) {
-    return 'red'
-  }
-  for (const item of poss.values) {
-    const color = COLORS[tiles[item][4]]
+  let count = 0
+  for (let i = 0; i < tiles.length; i++) {
+    if (!poss.has(i)) {
+      continue
+    }
+    const color = COLORS[tiles[i][4]]
     if (color) {
       r += color.r
       g += color.g
@@ -222,21 +215,22 @@ function displayColor (poss, tiles) {
       g += 200
       b += 255
     }
+    count += 1
   }
-  r /= poss.values.length
-  g /= poss.values.length
-  b /= poss.values.length
-  return `rgb(${r}, ${g}, ${b})`
+  if (count === 0) {
+    return 'red'
+  }
+  return `rgb(${r / count}, ${g / count}, ${b / count})`
 }
 
 function display (context, wave, tiles) {
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       context.fillStyle = displayColor(wave[i * gridSize + j], tiles)
-      if (wave[i * gridSize + j].values.length === 1) {
-        context.strokeStyle = 'blue'
-        context.strokeRect(j * 30, i * 30, 29, 29)
-      }
+      // if (wave[i * gridSize + j].entropy() === 1) {
+      //   context.strokeStyle = 'blue'
+      //   context.strokeRect(j * 30, i * 30, 29, 29)
+      // }
       context.fillRect(j * 30, i * 30, 29, 29)
     }
   }
@@ -269,11 +263,10 @@ function propagate (selected, wave, rules) {
   while (changed.length > 0) {
     const selected = changed.pop()
     // console.log('Changed: ', selected)
-    const values = wave[selected].values
 
     for (const direction of [Up, Down, Left, Right]) {
       // Accumulate set of allowed neighbours in this direction
-      const allowed = combineAllowed(rules, values, direction)
+      const allowed = combineAllowed(rules, wave[selected], direction)
 
       if (allowed.length === 0) {
         console.log('OH NO! ABORTING')
@@ -283,7 +276,7 @@ function propagate (selected, wave, rules) {
       const neighbour = getNeighbour(selected, direction)
       const possibilities = wave[neighbour]
       const newPossibilities = possibilities.intersection(allowed)
-      if (newPossibilities.entropy() !== possibilities.entropy()) {
+      if (newPossibilities.contents !== possibilities.contents) {
         wave[neighbour] = newPossibilities
         // console.log(neighbour, ' -> ', possibilities)
         changed.push(neighbour)
