@@ -307,6 +307,16 @@ function selectAndCollapse (wave) {
   return best
 }
 
+function combineAllowed (rules, tiles, direction) {
+  const allowed = new Set()
+  for (const tile1 of tiles) {
+    for (const tile2 of rules[tile1].get(direction)) {
+      allowed.add(tile2)
+    }
+  }
+  return allowed
+}
+
 function propagate (selected, wave, rules) {
   const changed = [selected]
 
@@ -317,12 +327,7 @@ function propagate (selected, wave, rules) {
 
     for (const direction of [Up, Down, Left, Right]) {
       // Accumulate set of allowed neighbours in this direction
-      const allowed = new Set()
-      for (const tile1 of values) {
-        for (const tile2 of rules[tile1].get(direction)) {
-          allowed.add(tile2)
-        }
-      }
+      const allowed = combineAllowed(rules, values, direction)
 
       if (allowed.length === 0) {
         console.log('OH NO! ABORTING')
