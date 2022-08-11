@@ -172,13 +172,15 @@ function displayTile (context, x, y, tile) {
 }
 
 export function displayTiles (tiles) {
-  const canvas = document.getElementById('tiles')
-  canvas.width = 400
-  canvas.height = 1000
-  const context = canvas.getContext('2d')
   console.log('There are: ', tiles.length)
+
+  const tilesPerRow = Math.floor(Math.sqrt(tiles.length))
+  const canvas = document.getElementById('tiles')
+  canvas.width = 40 * tilesPerRow
+  canvas.height = 40 * (tilesPerRow + 1)
+  const context = canvas.getContext('2d')
   for (let i = 0; i < tiles.length; i++) {
-    displayTile(context, 40 * (i % 10), 40 * Math.floor(i / 10), tiles[i])
+    displayTile(context, 40 * (i % tilesPerRow), 40 * Math.floor(i / tilesPerRow), tiles[i])
   }
 }
 
