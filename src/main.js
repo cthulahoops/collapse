@@ -1,21 +1,45 @@
 import { Superposition } from './superposition.js'
 import { combineAllowed, buildRules, Up, Down, Left, Right } from './allowed.js'
+import { createEditor } from './editor.js'
 
 window.Superposition = Superposition
 
 const gridSize = 30
 
 function main () {
-  const tiles = extractTiles()
-  const rules = buildRules(tiles)
-
-  displayTiles(tiles)
-
   const canvas = document.getElementById('output')
   canvas.width = 900
   canvas.height = 900
-
   const context = canvas.getContext('2d')
+
+  let world = createWorld(SAMPLE)
+  displayTiles(world.tiles)
+
+  setInterval(() => {
+  // for (let i = 0; i < 14; i++) {
+    const selected = selectAndCollapse(world.wave)
+    if (selected < 0) {
+      return
+    }
+
+    propagate(selected, world.wave, world.rules)
+    display(context, world.wave, world.tiles)
+  // }
+  }, 100)
+
+  const pixels = createEditor()
+  const button = document.getElementById('generate')
+  button.addEventListener('click', () => {
+    console.log('Generate!')
+    const sample = pixels.map((line) => line.join(''))
+    world = createWorld(sample)
+    displayTiles(world.tiles)
+  })
+}
+
+function createWorld (sample) {
+  const tiles = extractTiles(sample)
+  const rules = buildRules(tiles)
 
   const ids = []
   for (let i = 0; i < tiles.length; i++) {
@@ -27,26 +51,7 @@ function main () {
   for (let i = 0; i < gridSize * gridSize; i++) {
     wave[i] = superposition
   }
-
-  setInterval(() => {
-  // for (let i = 0; i < 14; i++) {
-    const selected = selectAndCollapse(wave)
-    if (selected < 0) {
-      return
-    }
-
-    propagate(selected, wave, rules)
-    display(context, wave, tiles)
-  // }
-  }, 10)
-  // canvas.addEventListener('mousemove', (event) => {
-  //   const j = Math.floor((event.clientX - canvas.offsetLeft) / 30)
-  //   const i = Math.floor((event.clientY - canvas.offsetTop + window.pageYOffset) / 30)
-  //   if (i > gridSize || j > gridSize) {
-  //     return
-  //   }
-  //   displaySuperposition(wave[toIndex(i, j)], tiles)
-  // })
+  return { tiles, rules, wave }
 }
 
 const COLORS = {
@@ -133,14 +138,14 @@ function rotateAndReflect (tiles) {
   return tiles
 }
 
-function extractTiles () {
+function extractTiles (sample) {
   const tiles = []
-  for (let i = 0; i < SAMPLE.length; i++) {
-    for (let j = 0; j < SAMPLE[0].length; j++) {
+  for (let i = 0; i < sample.length; i++) {
+    for (let j = 0; j < sample[0].length; j++) {
       const pixels = []
       for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {
-          const value = SAMPLE[(i + y) % SAMPLE.length][(j + x) % SAMPLE[0].length]
+          const value = sample[(i + y) % sample.length][(j + x) % sample[0].length]
           pixels.push(value)
         }
       }
