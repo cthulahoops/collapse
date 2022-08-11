@@ -15,7 +15,7 @@ export function createEditor () {
     if (i > editorSize || j > editorSize) {
       return
     }
-    pixels[i][j] = 'X'
+    pixels[i][j] = 'K'
     display(canvas, pixels)
   })
 
