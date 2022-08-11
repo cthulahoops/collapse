@@ -1,5 +1,6 @@
 import { Superposition } from './superposition.js'
 import { combineAllowed, buildRules, Up, Down, Left, Right } from './allowed.js'
+import { createEditor } from './editor.js'
 
 window.Superposition = Superposition
 
@@ -38,15 +39,9 @@ function main () {
     propagate(selected, wave, rules)
     display(context, wave, tiles)
   // }
-  }, 10)
-  // canvas.addEventListener('mousemove', (event) => {
-  //   const j = Math.floor((event.clientX - canvas.offsetLeft) / 30)
-  //   const i = Math.floor((event.clientY - canvas.offsetTop + window.pageYOffset) / 30)
-  //   if (i > gridSize || j > gridSize) {
-  //     return
-  //   }
-  //   displaySuperposition(wave[toIndex(i, j)], tiles)
-  // })
+  }, 100)
+
+  createEditor()
 }
 
 const COLORS = {
