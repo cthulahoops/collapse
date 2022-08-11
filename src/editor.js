@@ -19,6 +19,15 @@ export function createEditor () {
     display(canvas, pixels)
   })
 
+  document.getElementById('clear').addEventListener('click', () => {
+    console.log('Clear!')
+    for (let i = 0; i < editorSize; i++) {
+      for (let j = 0; j < editorSize; j++) {
+        pixels[i][j] = ' '
+      }
+    }
+    display(canvas, pixels)
+  })
   return pixels
 }
 
