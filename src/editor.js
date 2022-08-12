@@ -44,12 +44,14 @@ export function createEditor () {
   })
 
   const picker = document.getElementById('color-picker')
+  picker.style.backgroundColor = getColorString(activeColor)
   for (const color of listColorCodes()) {
     const button = document.createElement('button')
     button.innerText = color
     button.style.backgroundColor = getColorString(color)
     button.addEventListener('click', (event) => {
       activeColor = color
+      picker.style.backgroundColor = getColorString(color)
     })
     picker.appendChild(button)
   }
