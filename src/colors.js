@@ -6,7 +6,8 @@ const COLORS = {
   K: { r: 0, g: 0, b: 0 },
   C: { r: 0, g: 255, b: 255 },
   7: { r: 128, g: 128, b: 128 },
-  W: { r: 255, g: 255, b: 255 }
+  W: { r: 255, g: 255, b: 255 },
+  P: { r: 155, g: 89, b: 208 }
 }
 
 export function listColorCodes () {
