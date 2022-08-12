@@ -1,6 +1,7 @@
 import { Superposition } from './superposition.js'
 import { combineAllowed, buildRules, Up, Down, Left, Right } from './allowed.js'
 import { createEditor } from './editor.js'
+import { COLORS } from './colors.js'
 
 window.Superposition = Superposition
 
@@ -52,17 +53,6 @@ function createWorld (sample) {
     wave[i] = superposition
   }
   return { tiles, rules, wave }
-}
-
-const COLORS = {
-  Y: { r: 255, g: 255, b: 0 },
-  G: { r: 0, g: 255, b: 0 },
-  B: { r: 0, g: 0, b: 255 },
-  R: { r: 255, g: 0, b: 0 },
-  K: { r: 0, g: 0, b: 0 },
-  C: { r: 0, g: 255, b: 255 },
-  7: { r: 128, g: 128, b: 128 },
-  W: { r: 255, g: 255, b: 255 }
 }
 
 const SAMPLE = [
