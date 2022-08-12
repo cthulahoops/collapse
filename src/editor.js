@@ -1,3 +1,5 @@
+import { getColorString } from './colors.js'
+
 const editorSize = 10
 
 export function createEditor () {
@@ -36,11 +38,7 @@ function display (canvas, pixels) {
 
   for (let i = 0; i < editorSize; i++) {
     for (let j = 0; j < editorSize; j++) {
-      if (pixels[i][j] === ' ') {
-        context.fillStyle = 'blue'
-      } else {
-        context.fillStyle = 'black'
-      }
+      context.fillStyle = getColorString(pixels[i][j])
       context.fillRect(j * 30, i * 30, 29, 29)
     }
   }

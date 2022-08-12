@@ -9,8 +9,13 @@ const COLORS = {
   W: { r: 255, g: 255, b: 255 }
 }
 
-export function getColor (colorString) {
-  const color = COLORS[colorString]
-  if (!color) { return { r: 200, g: 200, b: 255 } }
+export function getColor (colorCode) {
+  const color = COLORS[colorCode]
+  if (!color) { return { r: 240, g: 240, b: 240 } }
   return color
+}
+
+export function getColorString (colorCode) {
+  const color = getColor(colorCode)
+  return `rgb(${color.r}, ${color.g}, ${color.b})`
 }

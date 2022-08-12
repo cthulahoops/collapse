@@ -1,7 +1,7 @@
 import { Superposition } from './superposition.js'
 import { combineAllowed, buildRules, Up, Down, Left, Right } from './allowed.js'
 import { createEditor } from './editor.js'
-import { getColor } from './colors.js'
+import { getColor, getColorString } from './colors.js'
 
 window.Superposition = Superposition
 
@@ -149,9 +149,7 @@ function extractTiles (sample) {
 function displayTile (context, x, y, tile) {
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
-      const value = tile[3 * i + j]
-      const color = getColor(value)
-      context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
+      context.fillStyle = getColorString(tile[3 * i + j])
       context.fillRect(x + 10 * j, y + 10 * i, 9, 9)
     }
   }
