@@ -9,6 +9,10 @@ const COLORS = {
   W: { r: 255, g: 255, b: 255 }
 }
 
+export function listColorCodes () {
+  return Object.keys(COLORS)
+}
+
 export function getColor (colorCode) {
   const color = COLORS[colorCode]
   if (!color) { return { r: 240, g: 240, b: 240 } }

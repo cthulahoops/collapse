@@ -1,8 +1,9 @@
-import { getColorString } from './colors.js'
+import { getColorString, listColorCodes } from './colors.js'
 
 const editorSize = 10
 
 export function createEditor () {
+  let activeColor = 'K'
   const pixels = createGrid()
 
   const canvas = document.getElementById('editor')
@@ -17,7 +18,7 @@ export function createEditor () {
     if (i > editorSize || j > editorSize) {
       return
     }
-    pixels[i][j] = 'K'
+    pixels[i][j] = activeColor
     display(canvas, pixels)
   })
 
@@ -30,6 +31,16 @@ export function createEditor () {
     }
     display(canvas, pixels)
   })
+
+  const picker = document.getElementById('color-picker')
+  for (const color of listColorCodes()) {
+    const button = document.createElement('button')
+    button.innerText = color
+    button.addEventListener('click', (event) => {
+      activeColor = color
+    })
+    picker.appendChild(button)
+  }
   return pixels
 }
 
