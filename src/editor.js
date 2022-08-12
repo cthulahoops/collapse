@@ -36,6 +36,7 @@ export function createEditor () {
   for (const color of listColorCodes()) {
     const button = document.createElement('button')
     button.innerText = color
+    button.style.backgroundColor = getColorString(color)
     button.addEventListener('click', (event) => {
       activeColor = color
     })
