@@ -55,25 +55,26 @@ function createWorld (sample) {
   return { tiles, rules, wave }
 }
 
-const SAMPLE = [
-  'BBBBBBBBBBBBBBBBBBBBBB',
-  'BBBBBBBBBBBBBBBBBBBBBB',
-  'BBBBBBYYYYYYYBBBBBBBBB',
-  'BBBBBBYGGYGGGYBBBBBBBB',
-  'BBBBBYGGGGGGGGYBBBBBBB',
-  'BBBYYYGGGGGGGGYBBBBBBB',
-  'BBBYGGGG777GGGYBBBBBBB',
-  'BBBYGGG77W77GGYBBBBBBB',
-  'BBBYGG77W77GGGYBBBBBBB',
-  'BBBYGGG777GGGGYBBBBBBB',
-  'BBBYGGGGGGGGGGYBBBBBBB',
-  'BBBYGGGGGYYGYYYBBBBBBB',
-  'BBBBYGYYYBYGYBBBBBBBBB',
-  'BBBBBYBBBBYYBBBBBBBBBB',
-  'BBBBBBBBBBBBBBBBBBBBBB',
-  'BBBBBBBBBBBBBBBBBBBBBB',
-  'BBBBBBBBBBBBBBBBBBBBBB'
-]
+const SAMPLE = ['  ', ' K ', '   ']
+// const SAMPLE = [
+//   'BBBBBBBBBBBBBBBBBBBBBB',
+//   'BBBBBBBBBBBBBBBBBBBBBB',
+//   'BBBBBBYYYYYYYBBBBBBBBB',
+//   'BBBBBBYGGYGGGYBBBBBBBB',
+//   'BBBBBYGGGGGGGGYBBBBBBB',
+//   'BBBYYYGGGGGGGGYBBBBBBB',
+//   'BBBYGGGG777GGGYBBBBBBB',
+//   'BBBYGGG77W77GGYBBBBBBB',
+//   'BBBYGG77W77GGGYBBBBBBB',
+//   'BBBYGGG777GGGGYBBBBBBB',
+//   'BBBYGGGGGGGGGGYBBBBBBB',
+//   'BBBYGGGGGYYGYYYBBBBBBB',
+//   'BBBBYGYYYBYGYBBBBBBBBB',
+//   'BBBBBYBBBBYYBBBBBBBBBB',
+//   'BBBBBBBBBBBBBBBBBBBBBB',
+//   'BBBBBBBBBBBBBBBBBBBBBB',
+//   'BBBBBBBBBBBBBBBBBBBBBB'
+// ]
 
 // const SAMPLE = [
 //   'KKKK KKKKKKKKKK KKKKKK',
@@ -158,10 +159,10 @@ function displayTile (context, x, y, tile) {
 export function displayTiles (tiles) {
   console.log('There are: ', tiles.length)
 
-  const tilesPerRow = Math.floor(Math.sqrt(tiles.length))
+  const tilesPerRow = 10
   const canvas = document.getElementById('tiles')
   canvas.width = 40 * tilesPerRow
-  canvas.height = 40 * (tilesPerRow + 1)
+  canvas.height = 40 * Math.floor(1 + tiles.length / tilesPerRow)
   const context = canvas.getContext('2d')
   for (let i = 0; i < tiles.length; i++) {
     displayTile(context, 40 * (i % tilesPerRow), 40 * Math.floor(i / tilesPerRow), tiles[i])

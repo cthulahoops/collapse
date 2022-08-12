@@ -1,6 +1,6 @@
 import { getColorString, listColorCodes } from './colors.js'
 
-const editorSize = 10
+const editorSize = 12
 
 export function createEditor () {
   let activeColor = 'K'

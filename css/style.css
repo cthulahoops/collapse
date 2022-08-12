@@ -1,0 +1,6 @@
+.grid_container {
+	display: grid;
+	height: 80vh;
+	grid-template-columns: 25vw 50vw 25vw;
+	grid-template-areas: "input output tiles";
+}
