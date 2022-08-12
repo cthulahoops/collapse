@@ -1,7 +1,7 @@
 import { Superposition } from './superposition.js'
 import { combineAllowed, buildRules, Up, Down, Left, Right } from './allowed.js'
 import { createEditor } from './editor.js'
-import { COLORS } from './colors.js'
+import { getColor } from './colors.js'
 
 window.Superposition = Superposition
 
@@ -150,12 +150,8 @@ function displayTile (context, x, y, tile) {
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
       const value = tile[3 * i + j]
-      const color = COLORS[value]
-      if (color) {
-        context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
-      } else {
-        context.fillStyle = '#ccccff'
-      }
+      const color = getColor(value)
+      context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`
       context.fillRect(x + 10 * j, y + 10 * i, 9, 9)
     }
   }
@@ -202,16 +198,10 @@ function displayColor (poss, tiles) {
     if (!poss.has(i)) {
       continue
     }
-    const color = COLORS[tiles[i][4]]
-    if (color) {
-      r += color.r
-      g += color.g
-      b += color.b
-    } else {
-      r += 200
-      g += 200
-      b += 255
-    }
+    const color = getColor(tiles[i][4])
+    r += color.r
+    g += color.g
+    b += color.b
     count += 1
   }
   if (count === 0) {
