@@ -15,7 +15,7 @@ function main () {
   canvas.height = 900
   const context = canvas.getContext('2d')
 
-  let world = createWorld(pixels)
+  let world = createWorld(pixels, true, true)
   displayTiles(world.tiles)
 
   setInterval(() => {
@@ -34,13 +34,15 @@ function main () {
   button.addEventListener('click', () => {
     console.log('Generate!')
     const sample = pixels.map((line) => line.join(''))
-    world = createWorld(sample)
+    const rotate = document.getElementById('rotate').checked
+    const flip = document.getElementById('flip').checked
+    world = createWorld(sample, rotate, flip)
     displayTiles(world.tiles)
   })
 }
 
-function createWorld (sample) {
-  const tiles = extractTiles(sample)
+function createWorld (sample, rotate, flip) {
+  const tiles = extractTiles(sample, rotate, flip)
   const rules = buildRules(tiles)
 
   const ids = []
@@ -84,21 +86,23 @@ function rotate (tile) {
   const result = []
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
-      result.push(tile[3 * j + i])
+      result.push(tile[3 * j + (2 - i)])
     }
   }
   return result.join('')
 }
 
-function rotateAndReflect (tiles) {
-  tiles = tiles.concat(tiles.map(flipHorizonally))
-  tiles = tiles.concat(tiles.map(flipVertically))
-  tiles = tiles.concat(tiles.map(rotate))
+function rotateAll (tiles) {
+  let r = tiles
+  for (let i = 0; i < 3; i++) {
+    r = r.map(rotate)
+    tiles = tiles.concat(r)
+  }
   return tiles
 }
 
-function extractTiles (sample) {
-  const tiles = []
+function extractTiles (sample, rotate, flip) {
+  let tiles = []
   for (let i = 0; i < sample.length; i++) {
     for (let j = 0; j < sample[0].length; j++) {
       const pixels = []
@@ -112,7 +116,13 @@ function extractTiles (sample) {
     }
   }
 
-  return uniq(rotateAndReflect(tiles))
+  if (rotate) {
+    tiles = rotateAll(tiles)
+  }
+  if (flip) {
+    tiles = tiles.concat(tiles.map(flipHorizonally))
+  }
+  return uniq(tiles)
 }
 
 function displayTile (context, x, y, tile) {
