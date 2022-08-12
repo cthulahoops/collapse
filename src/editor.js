@@ -22,6 +22,17 @@ export function createEditor () {
     display(canvas, pixels)
   })
 
+  canvas.addEventListener('contextmenu', (event) => {
+    const j = Math.floor((event.clientX - canvas.offsetLeft) / 30)
+    const i = Math.floor((event.clientY - canvas.offsetTop + window.pageYOffset) / 30)
+    if (i > editorSize || j > editorSize) {
+      return
+    }
+    pixels[i][j] = ' '
+    display(canvas, pixels)
+    event.preventDefault()
+  })
+
   document.getElementById('clear').addEventListener('click', () => {
     console.log('Clear!')
     for (let i = 0; i < editorSize; i++) {
