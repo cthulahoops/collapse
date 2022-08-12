@@ -24,6 +24,7 @@ function main () {
     if (selected < 0) {
       return
     }
+    display(context, world.wave, world.tiles)
 
     propagate(selected, world.wave, world.rules)
     display(context, world.wave, world.tiles)
