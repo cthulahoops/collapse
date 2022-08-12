@@ -8,12 +8,14 @@ window.Superposition = Superposition
 const gridSize = 30
 
 function main () {
+  const pixels = createEditor()
+
   const canvas = document.getElementById('output')
   canvas.width = 900
   canvas.height = 900
   const context = canvas.getContext('2d')
 
-  let world = createWorld(SAMPLE)
+  let world = createWorld(pixels)
   displayTiles(world.tiles)
 
   setInterval(() => {
@@ -28,7 +30,6 @@ function main () {
   // }
   }, 100)
 
-  const pixels = createEditor()
   const button = document.getElementById('generate')
   button.addEventListener('click', () => {
     console.log('Generate!')
@@ -54,39 +55,6 @@ function createWorld (sample) {
   }
   return { tiles, rules, wave }
 }
-
-const SAMPLE = ['  ', ' K ', '   ']
-// const SAMPLE = [
-//   'BBBBBBBBBBBBBBBBBBBBBB',
-//   'BBBBBBBBBBBBBBBBBBBBBB',
-//   'BBBBBBYYYYYYYBBBBBBBBB',
-//   'BBBBBBYGGYGGGYBBBBBBBB',
-//   'BBBBBYGGGGGGGGYBBBBBBB',
-//   'BBBYYYGGGGGGGGYBBBBBBB',
-//   'BBBYGGGG777GGGYBBBBBBB',
-//   'BBBYGGG77W77GGYBBBBBBB',
-//   'BBBYGG77W77GGGYBBBBBBB',
-//   'BBBYGGG777GGGGYBBBBBBB',
-//   'BBBYGGGGGGGGGGYBBBBBBB',
-//   'BBBYGGGGGYYGYYYBBBBBBB',
-//   'BBBBYGYYYBYGYBBBBBBBBB',
-//   'BBBBBYBBBBYYBBBBBBBBBB',
-//   'BBBBBBBBBBBBBBBBBBBBBB',
-//   'BBBBBBBBBBBBBBBBBBBBBB',
-//   'BBBBBBBBBBBBBBBBBBBBBB'
-// ]
-
-// const SAMPLE = [
-//   'KKKK KKKKKKKKKK KKKKKK',
-//   'KKKK KKKKKKKKKK KKKKKK',
-//   'KKKK    KKKK       KKK',
-//   '              BB      ',
-//   'KKK     KKKK  BB   KKK',
-//   'KKK     KKKK  BB   KKK',
-//   'KKKK KKKKKKK       KKK',
-//   'KKKK KKKYRKKKKK KKKKKK',
-//   'KKKK KKKYKKKKKK KKKKKK'
-// ]
 
 function uniq (list) {
   return Array.from(new Set(list))
