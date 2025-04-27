@@ -53,7 +53,7 @@ function main() {
 
 window.getPondiverseCreation = () => {
   return {
-    type: "collapse.cthulahoops.org",
+    type: "collapse",
     data: "TODO",
     image: getScreenshot(),
   };
