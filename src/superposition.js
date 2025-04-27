@@ -1,3 +1,5 @@
+import { getColor } from './colors.js'
+
 export class Superposition {
   constructor (contents) {
     this.contents = contents
@@ -12,6 +14,9 @@ export class Superposition {
   }
 
   entropy () {
+    if (this._entropy) {
+      return this._entropy
+    }
     let count = 0
     let contents = this.contents
     // console.log(contents)
@@ -21,7 +26,33 @@ export class Superposition {
       }
       contents >>= BigInt(1)
     }
+    this._entropy = count
     return count
+  }
+
+  displayColor (tiles) {
+    if (this._color) {
+      return this._color
+    }
+    let r = 0
+    let g = 0
+    let b = 0
+    let count = 0
+    for (let i = 0; i < tiles.length; i++) {
+      if (!this.has(i)) {
+        continue
+      }
+      const color = getColor(tiles[i][4])
+      r += color.r
+      g += color.g
+      b += color.b
+      count += 1
+    }
+    if (count === 0) {
+      return 'red'
+    }
+    this._color = `rgb(${r / count}, ${g / count}, ${b / count})`
+    return this._color
   }
 
   intersection (allowed) {
