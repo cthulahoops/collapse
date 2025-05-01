@@ -1,103 +1,121 @@
 import { getColorString, listColorCodes } from "./colors.js";
 
-const editorSize = 12;
+const EDITOR_SIZE = 12;
 
-export function createEditor() {
-  let activeColor = "K";
-  const pixels = createGrid();
+export class PixelEditor {
+  constructor({
+    canvasId = "editor",
+    clearButtonId = "clear",
+    colorPickerId = "color-picker",
+    size = EDITOR_SIZE,
+    cellSize = 30,
+  } = {}) {
+    this.size = size;
+    this.cellSize = cellSize;
+    this.activeColor = "K";
+    this.pixels = this.createGrid();
 
-  const canvas = document.getElementById("editor");
-  canvas.width = 400;
-  canvas.height = 400;
+    this.canvas = document.getElementById(canvasId);
+    this.clearButton = document.getElementById(clearButtonId);
+    this.picker = document.getElementById(colorPickerId);
 
-  display(canvas, pixels);
+    this.canvas.width = this.size * this.cellSize + 1;
+    this.canvas.height = this.size * this.cellSize + 1;
 
-  canvas.addEventListener("click", (event) => {
-    const j = Math.floor((event.clientX - canvas.offsetLeft) / 30);
-    const i = Math.floor(
-      (event.clientY - canvas.offsetTop + window.pageYOffset) / 30,
+    this.display();
+
+    this.canvas.addEventListener("click", (e) => this.handleClick(e));
+    this.canvas.addEventListener("contextmenu", (e) =>
+      this.handleRightClick(e),
     );
-    if (i > editorSize || j > editorSize) {
-      return;
-    }
-    pixels[i][j] = activeColor;
-    display(canvas, pixels);
-  });
+    this.clearButton.addEventListener("click", () => this.clear());
+    this.setupColorPicker();
+  }
 
-  canvas.addEventListener("contextmenu", (event) => {
-    const j = Math.floor((event.clientX - canvas.offsetLeft) / 30);
-    const i = Math.floor(
-      (event.clientY - canvas.offsetTop + window.pageYOffset) / 30,
-    );
-    if (i > editorSize || j > editorSize) {
-      return;
-    }
-    pixels[i][j] = " ";
-    display(canvas, pixels);
+  handleClick(event) {
+    const [i, j] = this.getCellFromEvent(event);
+    if (!this.isValidCell(i, j)) return;
+    this.pixels[i][j] = this.activeColor;
+    this.display();
+  }
+
+  handleRightClick(event) {
+    const [i, j] = this.getCellFromEvent(event);
+    if (!this.isValidCell(i, j)) return;
+    this.pixels[i][j] = " ";
+    this.display();
     event.preventDefault();
-  });
+  }
 
-  document.getElementById("clear").addEventListener("click", () => {
-    console.log("Clear!");
-    for (let i = 0; i < editorSize; i++) {
-      for (let j = 0; j < editorSize; j++) {
-        pixels[i][j] = " ";
+  getCellFromEvent(event) {
+    const rect = this.canvas.getBoundingClientRect();
+    const j = Math.floor((event.clientX - rect.left) / this.cellSize);
+    const i = Math.floor((event.clientY - rect.top) / this.cellSize);
+    return [i, j];
+  }
+
+  isValidCell(i, j) {
+    return i >= 0 && j >= 0 && i < this.size && j < this.size;
+  }
+
+  clear() {
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        this.pixels[i][j] = " ";
       }
     }
-    display(canvas, pixels);
-  });
-
-  const picker = document.getElementById("color-picker");
-  picker.style.backgroundColor = getColorString(activeColor);
-  for (const color of listColorCodes()) {
-    const button = document.createElement("button");
-    button.innerText = color;
-    button.style.backgroundColor = getColorString(color);
-    button.addEventListener("click", (event) => {
-      activeColor = color;
-      picker.style.backgroundColor = getColorString(color);
-    });
-    picker.appendChild(button);
+    this.display();
   }
-  return pixels;
-}
 
-function display(canvas, pixels) {
-  const context = canvas.getContext("2d");
-
-  for (let i = 0; i < editorSize; i++) {
-    for (let j = 0; j < editorSize; j++) {
-      context.fillStyle = getColorString(pixels[i][j]);
-      context.fillRect(j * 30, i * 30, 29, 29);
+  setupColorPicker() {
+    this.picker.innerHTML = "";
+    this.picker.style.backgroundColor = getColorString(this.activeColor);
+    for (const color of listColorCodes()) {
+      const button = document.createElement("button");
+      button.innerText = color;
+      button.style.backgroundColor = getColorString(color);
+      button.addEventListener("click", () => {
+        this.activeColor = color;
+        this.picker.style.backgroundColor = getColorString(color);
+      });
+      this.picker.appendChild(button);
     }
   }
-}
 
-function createGrid() {
-  const pixels = [];
-  for (let i = 0; i < editorSize; i++) {
-    const line = [];
-    for (let j = 0; j < editorSize; j++) {
-      line.push(" ");
-    }
-    pixels.push(line);
-  }
-  return pixels;
-}
-
-export function setEditorState(pixels, pixelString) {
-  const canvas = document.getElementById("editor");
-  const lines = pixelString.split("\n");
-  for (let i = 0; i < editorSize; i++) {
-    for (let j = 0; j < editorSize; j++) {
-      pixels[i][j] = lines[i][j] || " ";
+  display() {
+    const ctx = this.canvas.getContext("2d");
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        ctx.fillStyle = getColorString(this.pixels[i][j]);
+        ctx.fillRect(
+          j * this.cellSize,
+          i * this.cellSize,
+          this.cellSize - 1,
+          this.cellSize - 1,
+        );
+      }
     }
   }
-  display(canvas, pixels);
-}
 
-export function toPixelString(pixels) {
-  // Use join to create a string representation of the pixel array
-  const pixelString = pixels.map((row) => row.join("")).join("\n");
-  return pixelString;
+  createGrid() {
+    return Array.from({ length: this.size }, () => Array(this.size).fill(" "));
+  }
+
+  setState(pixelString) {
+    const lines = pixelString.split("\n");
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        this.pixels[i][j] = lines[i]?.[j] || " ";
+      }
+    }
+    this.display();
+  }
+
+  toPixelString() {
+    return this.pixels.map((row) => row.join("")).join("\n");
+  }
+
+  lines() {
+    return this.pixels.map((row) => row.join(""));
+  }
 }

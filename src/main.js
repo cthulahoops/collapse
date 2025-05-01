@@ -12,7 +12,7 @@ import {
   Left,
   Right,
 } from "./allowed.js";
-import { createEditor, toPixelString, setEditorState } from "./editor.js";
+import { PixelEditor } from "./editor.js";
 import { getColorString } from "./colors.js";
 
 window.Superposition = Superposition;
@@ -23,18 +23,14 @@ function main() {
   const urlParams = new URLSearchParams(window.location.search);
   const creationId = urlParams.get("creation");
 
-  const pixels = createEditor();
+  const pixels = new PixelEditor();
 
   if (creationId) {
     fetchCreation(creationId).then((result) => {
       const { data } = result;
       const { editor, rotate, flip } = JSON.parse(data);
 
-      // If you have fromPixelString:
-      // const pixels = fromPixelString(editor);
-      // setState(pixels, editor);
-
-      setEditorState(pixels, editor);
+      pixels.setState(editor);
 
       document.getElementById("rotate").checked = !!rotate;
       document.getElementById("flip").checked = !!flip;
@@ -63,10 +59,9 @@ function main() {
   const button = document.getElementById("generate");
   button.addEventListener("click", () => {
     console.log("Generate!");
-    const sample = pixels.map((line) => line.join(""));
     const rotate = document.getElementById("rotate").checked;
     const flip = document.getElementById("flip").checked;
-    world = createWorld(sample, rotate, flip);
+    world = createWorld(pixels.lines(), rotate, flip);
     displayTiles(world.tiles);
   });
 
@@ -74,7 +69,7 @@ function main() {
     return {
       type: "collapse",
       data: JSON.stringify({
-        editor: toPixelString(pixels),
+        editor: pixels.toPixelString(),
         rotate: document.getElementById("rotate").checked,
         flip: document.getElementById("flip").checked,
       }),
