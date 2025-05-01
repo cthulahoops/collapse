@@ -1,4 +1,7 @@
-import { addPondiverseButton } from "https://www.pondiverse.com/script/pondiverse.js";
+import {
+  addPondiverseButton,
+  fetchCreation,
+} from "https://www.pondiverse.com/script/pondiverse.js";
 
 import { Superposition } from "./superposition.js";
 import {
@@ -9,7 +12,7 @@ import {
   Left,
   Right,
 } from "./allowed.js";
-import { createEditor } from "./editor.js";
+import { createEditor, toPixelString, setEditorState } from "./editor.js";
 import { getColorString } from "./colors.js";
 
 window.Superposition = Superposition;
@@ -17,7 +20,26 @@ window.Superposition = Superposition;
 const gridSize = 60;
 
 function main() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const creationId = urlParams.get("creation");
+
   const pixels = createEditor();
+
+  if (creationId) {
+    fetchCreation(creationId).then((result) => {
+      const { data } = result;
+      const { editor, rotate, flip } = JSON.parse(data);
+
+      // If you have fromPixelString:
+      // const pixels = fromPixelString(editor);
+      // setState(pixels, editor);
+
+      setEditorState(pixels, editor);
+
+      document.getElementById("rotate").checked = !!rotate;
+      document.getElementById("flip").checked = !!flip;
+    });
+  }
 
   const canvas = document.getElementById("output");
   canvas.width = 900;
@@ -48,16 +70,19 @@ function main() {
     displayTiles(world.tiles);
   });
 
+  window.getPondiverseCreation = () => {
+    return {
+      type: "collapse",
+      data: JSON.stringify({
+        editor: toPixelString(pixels),
+        rotate: document.getElementById("rotate").checked,
+        flip: document.getElementById("flip").checked,
+      }),
+      image: getScreenshot(),
+    };
+  };
   addPondiverseButton();
 }
-
-window.getPondiverseCreation = () => {
-  return {
-    type: "collapse",
-    data: "TODO",
-    image: getScreenshot(),
-  };
-};
 
 function getScreenshot() {
   const canvas = document.getElementById("output");
