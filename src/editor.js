@@ -24,7 +24,10 @@ export class PixelEditor {
 
     this.display();
 
+    this.clickTimer = null;
     this.canvas.addEventListener("click", (e) => this.handleClick(e));
+    this.canvas.addEventListener("dblclick", (e) => this.handleDoubleClick(e));
+
     this.canvas.addEventListener("contextmenu", (e) =>
       this.handleRightClick(e),
     );
@@ -34,8 +37,42 @@ export class PixelEditor {
 
   handleClick(event) {
     const [i, j] = this.getCellFromEvent(event);
-    if (!this.isValidCell(i, j)) return;
+
+    const [lastI, lastJ, lastColor] = this.lastCell || [];
+    if (lastI !== i || lastJ !== j) {
+      this.lastCell = [i, j, this.pixels[i][j]];
+    }
+
     this.pixels[i][j] = this.activeColor;
+    this.display();
+
+    if (this.clickTimer) {
+      clearTimeout(this.clickTimer);
+    }
+
+    this.clickTimer = setTimeout(() => {
+      this.clickTimer = null;
+      this.lastCell = null;
+    }, 200);
+  }
+
+  handleDoubleClick(event) {
+    const [i, j] = this.getCellFromEvent(event);
+
+    if (!this.isValidCell(i, j)) return;
+
+    const [lastI, lastJ, lastColor] = this.lastCell || [];
+
+    let targetColor;
+    if (i === lastI && j === lastJ) {
+      targetColor = lastColor;
+    } else {
+      targetColor = this.pixels[i][j];
+    }
+
+    if (targetColor === this.activeColor) return;
+    this.pixels[i][j] = targetColor;
+    this.floodFill(i, j, targetColor, this.activeColor);
     this.display();
   }
 
@@ -45,6 +82,24 @@ export class PixelEditor {
     this.pixels[i][j] = " ";
     this.display();
     event.preventDefault();
+  }
+
+  floodFill(i, j, targetColor, replacementColor) {
+    if (targetColor === replacementColor) return;
+    const stack = [[i, j]];
+    while (stack.length) {
+      const [x, y] = stack.pop();
+      const modX = mod(x, this.size);
+      const modY = mod(y, this.size);
+      if (this.pixels[modX][modY] !== targetColor) {
+        continue;
+      }
+      this.pixels[modX][y] = replacementColor;
+      stack.push([modX + 1, modY]);
+      stack.push([modX - 1, modY]);
+      stack.push([modX, modY + 1]);
+      stack.push([modX, modY - 1]);
+    }
   }
 
   getCellFromEvent(event) {
@@ -118,4 +173,8 @@ export class PixelEditor {
   lines() {
     return this.pixels.map((row) => row.join(""));
   }
+}
+
+function mod(x, n) {
+  return ((x % n) + n) % n;
 }
