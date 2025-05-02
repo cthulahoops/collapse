@@ -169,46 +169,25 @@ function extractTiles(sample, rotate, flip) {
   return uniq(tiles);
 }
 
-function displayTile(context, x, y, tile) {
+export function displayTiles(tiles) {
+  const container = document.getElementById("tiles");
+  // canvas.width = 40 * tilesPerRow;
+  // canvas.height = 40 * Math.floor(1 + tiles.length / tilesPerRow);
+  for (let i = 0; i < tiles.length; i++) {
+    const canvas = document.createElement("canvas");
+    container.appendChild(canvas);
+    displayTile(canvas, tiles[i]);
+  }
+}
+function displayTile(canvas, tile) {
+  canvas.width = 30;
+  canvas.height = 30;
+
+  const context = canvas.getContext("2d");
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
       context.fillStyle = getColorString(tile[3 * i + j]);
-      context.fillRect(x + 10 * j, y + 10 * i, 9, 9);
-    }
-  }
-}
-
-export function displayTiles(tiles) {
-  const tilesPerRow = 10;
-  const canvas = document.getElementById("tiles");
-  canvas.width = 40 * tilesPerRow;
-  canvas.height = 40 * Math.floor(1 + tiles.length / tilesPerRow);
-  const context = canvas.getContext("2d");
-  for (let i = 0; i < tiles.length; i++) {
-    displayTile(
-      context,
-      40 * (i % tilesPerRow),
-      40 * Math.floor(i / tilesPerRow),
-      tiles[i],
-    );
-  }
-}
-
-function displayRules(rules, tiles) {
-  const canvas = document.getElementById("tiles");
-  canvas.width = 400;
-  canvas.height = 700;
-  const context = canvas.getContext("2d");
-  let y = 0;
-  for (let i = 0; i < rules.length; i++) {
-    for (const direction of [Up, Down, Left, Right]) {
-      displayTile(context, 0, y, tiles[i]);
-      let x = 60;
-      for (const t2 of rules[i].get(direction)) {
-        displayTile(context, x, y, tiles[t2]);
-        x += 40;
-      }
-      y += 40;
+      context.fillRect(10 * j, 10 * i, 9, 9);
     }
   }
 }

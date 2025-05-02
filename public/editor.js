@@ -8,10 +8,8 @@ export class PixelEditor {
     clearButtonId = "clear",
     colorPickerId = "color-picker",
     size = EDITOR_SIZE,
-    cellSize = 30,
   } = {}) {
     this.size = size;
-    this.cellSize = cellSize;
     this.activeColor = "K";
     this.pixels = this.createGrid();
 
@@ -19,8 +17,7 @@ export class PixelEditor {
     this.clearButton = document.getElementById(clearButtonId);
     this.picker = document.getElementById(colorPickerId);
 
-    this.canvas.width = this.size * this.cellSize + 1;
-    this.canvas.height = this.size * this.cellSize + 1;
+    this.canvas.height = this.canvas.width;
 
     this.display();
 
@@ -104,8 +101,18 @@ export class PixelEditor {
 
   getCellFromEvent(event) {
     const rect = this.canvas.getBoundingClientRect();
-    const j = Math.floor((event.clientX - rect.left) / this.cellSize);
-    const i = Math.floor((event.clientY - rect.top) / this.cellSize);
+
+    // Scale mouse coordinates to canvas coordinates
+    const scaleX = this.canvas.width / rect.width;
+    const scaleY = this.canvas.height / rect.height;
+
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+
+    const cellSize = this.canvas.width / this.size;
+    const j = Math.floor(x / cellSize);
+    const i = Math.floor(y / cellSize);
+
     return [i, j];
   }
 
@@ -139,15 +146,12 @@ export class PixelEditor {
 
   display() {
     const ctx = this.canvas.getContext("2d");
+    const cellSize = this.canvas.width / this.size;
+    console.log(cellSize);
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
         ctx.fillStyle = getColorString(this.pixels[i][j]);
-        ctx.fillRect(
-          j * this.cellSize,
-          i * this.cellSize,
-          this.cellSize - 1,
-          this.cellSize - 1,
-        );
+        ctx.fillRect(j * cellSize, i * cellSize, cellSize - 1, cellSize - 1);
       }
     }
   }

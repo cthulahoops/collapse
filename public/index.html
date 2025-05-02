@@ -5,6 +5,7 @@
         <title>Collapse</title>
         <script src="./main.js" type=module></script>
         <link rel="stylesheet" href="css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script>
             window.goatcounter = {
                 path: function(p) { return "collapse./" + p }
@@ -14,8 +15,8 @@
             async src="//gc.zgo.at/count.js"></script>
     </head>
     <body>
-        <div class=grid_container>
-            <div class="input">
+        <div class="container">
+            <div id="input">
                 <canvas id="editor"></canvas>
                 <div id=color-picker></div>
                 <label for=rotate>Rotate</label><input type=checkbox id=rotate checked>
@@ -24,7 +25,7 @@
                 <button id="clear">Clear</button>
             </div>
             <canvas class="output" id="output"></canvas>
-            <canvas id="tiles"></canvas>
+            <div id="tiles"></div>
         </div>
     </body>
 </html>
