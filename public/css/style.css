@@ -16,6 +16,9 @@ body {
 
 .container > * {
     width: 100%;
+    flex: 1 1 300px;
+    min-width: 200px;
+    max-width: 100%;
 }
 
 #editor {
@@ -23,18 +26,12 @@ body {
     object-fit: contain;
 }
 
-#input, #tiles {
-    flex: 1 1 300px;
-    min-width: 200px;
-    max-width: 100%;
-}
-
 #output {
     width: 100%;
     object-fit: contain;
     flex: 2 1 600px;
     min-width: 0;
-    max-width: calc(max(100%, 100svh - 30px));
+    max-width: calc(min(100%, 100svh - 10px));
     border: 1px solid black;
 }
 
