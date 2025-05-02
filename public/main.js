@@ -1,7 +1,7 @@
 import {
   addPondiverseButton,
-  fetchCreation,
-} from "https://www.pondiverse.com/script/pondiverse.js";
+  fetchPondiverseCreation,
+} from "https://www.pondiverse.com/pondiverse.js";
 
 import { Superposition } from "./superposition.js";
 import {
@@ -26,7 +26,7 @@ function main() {
   const pixels = new PixelEditor();
 
   if (creationId) {
-    fetchCreation(creationId).then((result) => {
+    fetchPondiverseCreation(creationId).then((result) => {
       const { data } = result;
       const { editor, rotate, flip } = JSON.parse(data);
 
@@ -65,7 +65,7 @@ function main() {
     displayTiles(world.tiles);
   });
 
-  window.getPondiverseCreation = () => {
+  addPondiverseButton(() => {
     return {
       type: "collapse",
       data: JSON.stringify({
@@ -75,8 +75,7 @@ function main() {
       }),
       image: getScreenshot(),
     };
-  };
-  addPondiverseButton();
+  });
 }
 
 function getScreenshot() {
