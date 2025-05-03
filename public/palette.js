@@ -44,4 +44,12 @@ export class Palette {
   reset(colors = DEFAULT_COLORS) {
     this._colors = { ...colors };
   }
+
+  toJSON() {
+    return { ...this._colors };
+  }
+
+  setState(obj) {
+    this._colors = { ...obj };
+  }
 }

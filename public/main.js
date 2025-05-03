@@ -29,8 +29,12 @@ function main() {
   if (creationId) {
     fetchPondiverseCreation(creationId).then((result) => {
       const { data } = result;
-      const { editor, rotate, flip } = JSON.parse(data);
+      const { editor, rotate, flip, palette: paletteData } = JSON.parse(data);
 
+      if (paletteData) {
+        palette.setState(paletteData);
+        pixels.setupColorPicker();
+      }
       pixels.setState(editor);
 
       document.getElementById("rotate").checked = !!rotate;
@@ -70,6 +74,7 @@ function main() {
       type: "collapse",
       data: JSON.stringify({
         editor: pixels.toPixelString(),
+        palette: pixels.palette.toJSON(),
         rotate: document.getElementById("rotate").checked,
         flip: document.getElementById("flip").checked,
       }),
