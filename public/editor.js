@@ -1,4 +1,4 @@
-import { getColorString, listColorCodes } from "./colors.js";
+import { Palette } from "./palette.js";
 
 const EDITOR_SIZE = 12;
 
@@ -8,10 +8,12 @@ export class PixelEditor {
     clearButtonId = "clear",
     colorPickerId = "color-picker",
     size = EDITOR_SIZE,
+    palette = null, // new!
   } = {}) {
     this.size = size;
     this.activeColor = "K";
     this.pixels = this.createGrid();
+    this.palette = palette || new Palette();
 
     this.canvas = document.getElementById(canvasId);
     this.clearButton = document.getElementById(clearButtonId);
@@ -131,14 +133,16 @@ export class PixelEditor {
 
   setupColorPicker() {
     this.picker.innerHTML = "";
-    this.picker.style.backgroundColor = getColorString(this.activeColor);
-    for (const color of listColorCodes()) {
+    this.picker.style.backgroundColor = this.palette.getColorString(
+      this.activeColor,
+    );
+    for (const color of this.palette.listColorCodes()) {
       const button = document.createElement("button");
       button.innerText = color;
-      button.style.backgroundColor = getColorString(color);
+      button.style.backgroundColor = this.palette.getColorString(color);
       button.addEventListener("click", () => {
         this.activeColor = color;
-        this.picker.style.backgroundColor = getColorString(color);
+        this.picker.style.backgroundColor = this.palette.getColorString(color);
       });
       this.picker.appendChild(button);
     }
@@ -150,7 +154,7 @@ export class PixelEditor {
     console.log(cellSize);
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
-        ctx.fillStyle = getColorString(this.pixels[i][j]);
+        ctx.fillStyle = this.palette.getColorString(this.pixels[i][j]);
         ctx.fillRect(j * cellSize, i * cellSize, cellSize - 1, cellSize - 1);
       }
     }
