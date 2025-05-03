@@ -1,4 +1,4 @@
-import { getColorString, listColorCodes } from "./colors.js";
+import { Palette } from "./palette.js";
 
 const EDITOR_SIZE = 12;
 
@@ -8,10 +8,12 @@ export class PixelEditor {
     clearButtonId = "clear",
     colorPickerId = "color-picker",
     size = EDITOR_SIZE,
+    palette = null,
   } = {}) {
     this.size = size;
     this.activeColor = "K";
     this.pixels = this.createGrid();
+    this.palette = palette || new Palette();
 
     this.canvas = document.getElementById(canvasId);
     this.clearButton = document.getElementById(clearButtonId);
@@ -131,14 +133,38 @@ export class PixelEditor {
 
   setupColorPicker() {
     this.picker.innerHTML = "";
-    this.picker.style.backgroundColor = getColorString(this.activeColor);
-    for (const color of listColorCodes()) {
+    if (!this.colorInput) {
+      this.colorInput = document.createElement("input");
+      this.colorInput.type = "color";
+      this.colorInput.style.display = "none";
+      document.body.appendChild(this.colorInput);
+    }
+    this.picker.style.backgroundColor = this.palette.getColorString(
+      this.activeColor,
+    );
+    for (const color of this.palette.listColorCodes()) {
       const button = document.createElement("button");
       button.innerText = color;
-      button.style.backgroundColor = getColorString(color);
+      button.style.backgroundColor = this.palette.getColorString(color);
       button.addEventListener("click", () => {
         this.activeColor = color;
-        this.picker.style.backgroundColor = getColorString(color);
+        this.picker.style.backgroundColor = this.palette.getColorString(color);
+      });
+
+      button.addEventListener("dblclick", () => {
+        const rgb = this.palette.getColor(color);
+        this.colorInput.value = rgbToHex(rgb);
+
+        this.colorInput.onchange = () => {
+          const newRgb = hexToRgb(this.colorInput.value);
+          if (newRgb) {
+            this.palette.setColor(color, newRgb);
+            this.setupColorPicker();
+            this.display();
+          }
+        };
+
+        this.colorInput.click();
       });
       this.picker.appendChild(button);
     }
@@ -150,7 +176,7 @@ export class PixelEditor {
     console.log(cellSize);
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
-        ctx.fillStyle = getColorString(this.pixels[i][j]);
+        ctx.fillStyle = this.palette.getColorString(this.pixels[i][j]);
         ctx.fillRect(j * cellSize, i * cellSize, cellSize - 1, cellSize - 1);
       }
     }
@@ -181,4 +207,33 @@ export class PixelEditor {
 
 function mod(x, n) {
   return ((x % n) + n) % n;
+}
+
+function rgbToHex({ r, g, b }) {
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      })
+      .join("")
+  );
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, "");
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  if (hex.length !== 6) return null;
+  const num = parseInt(hex, 16);
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
 }
