@@ -133,6 +133,12 @@ export class PixelEditor {
 
   setupColorPicker() {
     this.picker.innerHTML = "";
+    if (!this.colorInput) {
+      this.colorInput = document.createElement("input");
+      this.colorInput.type = "color";
+      this.colorInput.style.display = "none";
+      document.body.appendChild(this.colorInput);
+    }
     this.picker.style.backgroundColor = this.palette.getColorString(
       this.activeColor,
     );
@@ -143,6 +149,22 @@ export class PixelEditor {
       button.addEventListener("click", () => {
         this.activeColor = color;
         this.picker.style.backgroundColor = this.palette.getColorString(color);
+      });
+
+      button.addEventListener("dblclick", () => {
+        const rgb = this.palette.getColor(color);
+        this.colorInput.value = rgbToHex(rgb);
+
+        this.colorInput.onchange = () => {
+          const newRgb = hexToRgb(this.colorInput.value);
+          if (newRgb) {
+            this.palette.setColor(color, newRgb);
+            this.setupColorPicker();
+            this.display();
+          }
+        };
+
+        this.colorInput.click();
       });
       this.picker.appendChild(button);
     }
@@ -185,4 +207,33 @@ export class PixelEditor {
 
 function mod(x, n) {
   return ((x % n) + n) % n;
+}
+
+function rgbToHex({ r, g, b }) {
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      })
+      .join("")
+  );
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, "");
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  if (hex.length !== 6) return null;
+  const num = parseInt(hex, 16);
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
 }
