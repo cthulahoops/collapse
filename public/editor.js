@@ -8,7 +8,7 @@ export class PixelEditor {
     clearButtonId = "clear",
     colorPickerId = "color-picker",
     size = EDITOR_SIZE,
-    palette = null, // new!
+    palette = null,
   } = {}) {
     this.size = size;
     this.activeColor = "K";

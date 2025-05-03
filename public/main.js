@@ -12,8 +12,8 @@ import {
   Left,
   Right,
 } from "./allowed.js";
+import { Palette } from "./palette.js";
 import { PixelEditor } from "./editor.js";
-import { getColorString } from "./colors.js";
 
 window.Superposition = Superposition;
 
@@ -23,7 +23,8 @@ function main() {
   const urlParams = new URLSearchParams(window.location.search);
   const creationId = urlParams.get("creation");
 
-  const pixels = new PixelEditor();
+  const palette = new Palette();
+  const pixels = new PixelEditor({ palette });
 
   if (creationId) {
     fetchPondiverseCreation(creationId).then((result) => {
@@ -43,17 +44,16 @@ function main() {
   const context = canvas.getContext("2d");
 
   let world = createWorld(pixels, true, true);
-  displayTiles(world.tiles);
+  displayTiles(world.tiles, palette);
 
   setInterval(() => {
     const selected = selectAndCollapse(world.wave);
     if (selected < 0) {
       return;
     }
-    display(context, world.wave, world.tiles);
-
+    displayOutput(context, world.wave, world.tiles, palette);
     propagate(selected, world.wave, world.rules);
-    display(context, world.wave, world.tiles);
+    displayOutput(context, world.wave, world.tiles, palette);
   }, 100);
 
   const button = document.getElementById("generate");
@@ -62,7 +62,7 @@ function main() {
     const rotate = document.getElementById("rotate").checked;
     const flip = document.getElementById("flip").checked;
     world = createWorld(pixels.lines(), rotate, flip);
-    displayTiles(world.tiles);
+    displayTiles(world.tiles, palette);
   });
 
   addPondiverseButton(() => {
@@ -168,33 +168,32 @@ function extractTiles(sample, rotate, flip) {
   return uniq(tiles);
 }
 
-export function displayTiles(tiles) {
+export function displayTiles(tiles, palette) {
   const container = document.getElementById("tiles");
-  // canvas.width = 40 * tilesPerRow;
-  // canvas.height = 40 * Math.floor(1 + tiles.length / tilesPerRow);
+  container.innerHTML = "";
   for (let i = 0; i < tiles.length; i++) {
     const canvas = document.createElement("canvas");
     container.appendChild(canvas);
-    displayTile(canvas, tiles[i]);
+    displayTile(canvas, tiles[i], palette);
   }
 }
-function displayTile(canvas, tile) {
+function displayTile(canvas, tile, palette) {
   canvas.width = 30;
   canvas.height = 30;
 
   const context = canvas.getContext("2d");
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
-      context.fillStyle = getColorString(tile[3 * i + j]);
+      context.fillStyle = palette.getColorString(tile[3 * i + j]);
       context.fillRect(10 * j, 10 * i, 9, 9);
     }
   }
 }
 
-function display(context, wave, tiles) {
+function displayOutput(context, wave, tiles, palette) {
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      context.fillStyle = wave[i * gridSize + j].displayColor(tiles);
+      context.fillStyle = wave[i * gridSize + j].displayColor(palette, tiles);
       // if (wave[i * gridSize + j].entropy() === 1) {
       //   context.strokeStyle = 'blue'
       //   context.strokeRect(j * 30, i * 30, 29, 29)
