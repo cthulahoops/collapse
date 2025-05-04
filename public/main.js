@@ -1,6 +1,7 @@
 import {
   addPondiverseButton,
   fetchPondiverseCreation,
+  fetchPondiverseCreations,
 } from "https://www.pondiverse.com/pondiverse.js";
 
 import { Superposition } from "./superposition.js";
@@ -71,7 +72,7 @@ function main() {
   });
 
   addPondiverseButton(() => {
-    return {
+    const creation = {
       type: "collapse",
       data: JSON.stringify({
         editor: pixels.toPixelString(),
@@ -81,7 +82,43 @@ function main() {
       }),
       image: getScreenshot(),
     };
+    console.log(creation);
+    return creation;
   });
+
+  async function loadCreations() {
+    const creations = await fetchPondiverseCreations();
+    const collapseCreations = creations.filter(
+      (creation) => creation.type === "collapse",
+    );
+
+    const container = document.getElementById("creations");
+    for (const creation of collapseCreations) {
+      const li = document.createElement("li");
+      const button = document.createElement("a");
+      button.href = `?creation=${creation.id}`;
+      button.innerText = creation.title;
+      button.addEventListener("click", (event) => {
+        const { data } = creation;
+        const { editor, rotate, flip, palette: paletteData } = JSON.parse(data);
+
+        pixels.setState(editor);
+        palette.setState(paletteData);
+        pixels.setupColorPicker();
+
+        document.getElementById("rotate").checked = !!rotate;
+        document.getElementById("flip").checked = !!flip;
+        window.history.pushState(null, "", `?creation=${creation.id}`);
+        event.preventDefault();
+      });
+      li.appendChild(button);
+      container.appendChild(li);
+    }
+
+    console.log(collapseCreations);
+  }
+
+  loadCreations();
 }
 
 function getScreenshot() {

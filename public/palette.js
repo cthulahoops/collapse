@@ -72,6 +72,9 @@ export class Palette {
 
   setState(obj) {
     this.reset();
+    if (!obj) {
+      return;
+    }
     Object.keys(obj).forEach((key) => {
       const color = obj[key];
       if (typeof color === "string") {
