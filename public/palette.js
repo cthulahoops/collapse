@@ -29,6 +29,19 @@ export class Palette {
     return `rgb(${r}, ${g}, ${b})`;
   }
 
+  getColorHex(code) {
+    const { r, g, b } = this.getColor(code);
+    return (
+      "#" +
+      [r, g, b]
+        .map((x) => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? "0" + hex : hex;
+        })
+        .join("")
+    );
+  }
+
   listColorCodes() {
     return Object.keys(this._colors);
   }
@@ -46,10 +59,46 @@ export class Palette {
   }
 
   toJSON() {
-    return { ...this._colors };
+    Object.keys(this._colors).forEach((key) => {
+      if (isRGBEqual(this._colors[key], DEFAULT_COLORS[key])) {
+        return;
+      }
+      const hex = this.getColorHex(key);
+      hexColors[key] = hex;
+    });
+    return hexColors;
   }
 
   setState(obj) {
-    this._colors = { ...obj };
+    this.reset();
+    Object.keys(obj).forEach((key) => {
+      const color = obj[key];
+      if (typeof color === "string") {
+        this._colors[key] = hexToRgb(color);
+      } else if (color) {
+        this._colors[key] = color;
+      }
+    });
   }
+}
+
+function isRGBEqual(a, b) {
+  return a.r === b.r && a.g === b.g && a.b === b.b;
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, "");
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  if (hex.length !== 6) return null;
+  const num = parseInt(hex, 16);
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
 }

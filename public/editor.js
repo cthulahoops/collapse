@@ -152,8 +152,7 @@ export class PixelEditor {
       });
 
       button.addEventListener("dblclick", () => {
-        const rgb = this.palette.getColor(color);
-        this.colorInput.value = rgbToHex(rgb);
+        const rgb = this.palette.getColorHex(color);
 
         this.colorInput.onchange = () => {
           const newRgb = hexToRgb(this.colorInput.value);
@@ -207,18 +206,6 @@ export class PixelEditor {
 
 function mod(x, n) {
   return ((x % n) + n) % n;
-}
-
-function rgbToHex({ r, g, b }) {
-  return (
-    "#" +
-    [r, g, b]
-      .map((x) => {
-        const hex = x.toString(16);
-        return hex.length === 1 ? "0" + hex : hex;
-      })
-      .join("")
-  );
 }
 
 function hexToRgb(hex) {
