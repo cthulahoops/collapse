@@ -59,6 +59,7 @@ export class Palette {
   }
 
   toJSON() {
+    const hexColors = {};
     Object.keys(this._colors).forEach((key) => {
       if (isRGBEqual(this._colors[key], DEFAULT_COLORS[key])) {
         return;
