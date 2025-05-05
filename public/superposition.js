@@ -47,7 +47,7 @@ export class Superposition {
       count += 1;
     }
     if (count === 0) {
-      return "red";
+      return;
     }
     this._color = `rgb(${r / count}, ${g / count}, ${b / count})`;
     return this._color;

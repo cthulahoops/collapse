@@ -144,7 +144,12 @@ function displayTile(canvas, tile, palette) {
 function displayOutput(context, wave, tiles, palette) {
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      context.fillStyle = wave[i * gridSize + j].displayColor(palette, tiles);
+      const color = wave[i * gridSize + j].displayColor(palette, tiles);
+      if (color === undefined) {
+        return;
+      }
+      context.fillStyle = color;
+
       context.fillRect(j * 15, i * 15, 14, 14);
     }
   }
