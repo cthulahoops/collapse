@@ -26,11 +26,11 @@ function main() {
   const creationId = urlParams.get("creation");
 
   const palette = new Palette();
-  const pixels = new PixelEditor({ palette });
+  const editor = new PixelEditor({ palette });
 
   if (creationId) {
     fetchPondiverseCreation(creationId).then((creation) => {
-      pixels.loadCreation(creation);
+      editor.loadCreation(creation);
     });
   }
 
@@ -39,7 +39,7 @@ function main() {
   canvas.height = 900;
   const context = canvas.getContext("2d");
 
-  let world = createWorld(pixels, true, true);
+  let world = createWorld(editor, true, true);
   displayTiles(world.tiles, palette);
 
   setInterval(() => {
@@ -57,7 +57,7 @@ function main() {
     console.log("Generate!");
     const rotate = document.getElementById("rotate").checked;
     const flip = document.getElementById("flip").checked;
-    world = createWorld(pixels.lines(), rotate, flip);
+    world = createWorld(editor.lines(), rotate, flip);
     displayTiles(world.tiles, palette);
   });
 
@@ -65,8 +65,8 @@ function main() {
     const creation = {
       type: "collapse",
       data: JSON.stringify({
-        editor: pixels.toPixelString(),
-        palette: pixels.palette.toJSON(),
+        editor: editor.toPixelString(),
+        palette: editor.palette.toJSON(),
         rotate: document.getElementById("rotate").checked,
         flip: document.getElementById("flip").checked,
       }),
@@ -96,8 +96,6 @@ function main() {
       li.appendChild(button);
       container.appendChild(li);
     }
-
-    console.log(collapseCreations);
   }
 
   loadCreations();
