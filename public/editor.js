@@ -202,6 +202,16 @@ export class PixelEditor {
   lines() {
     return this.pixels.map((row) => row.join(""));
   }
+
+  loadCreation({ data }) {
+    const { editor, palette: paletteData, rotate, flip } = JSON.parse(data);
+    this.palette.setState(paletteData);
+    this.setupColorPicker();
+    this.setState(editor);
+
+    document.getElementById("rotate").checked = !!rotate;
+    document.getElementById("flip").checked = !!flip;
+  }
 }
 
 function mod(x, n) {

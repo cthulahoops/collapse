@@ -29,18 +29,8 @@ function main() {
   const pixels = new PixelEditor({ palette });
 
   if (creationId) {
-    fetchPondiverseCreation(creationId).then((result) => {
-      const { data } = result;
-      const { editor, rotate, flip, palette: paletteData } = JSON.parse(data);
-
-      if (paletteData) {
-        palette.setState(paletteData);
-        pixels.setupColorPicker();
-      }
-      pixels.setState(editor);
-
-      document.getElementById("rotate").checked = !!rotate;
-      document.getElementById("flip").checked = !!flip;
+    fetchPondiverseCreation(creationId).then((creation) => {
+      pixels.loadCreation(creation);
     });
   }
 
@@ -99,15 +89,7 @@ function main() {
       button.href = `?creation=${creation.id}`;
       button.innerText = creation.title;
       button.addEventListener("click", (event) => {
-        const { data } = creation;
-        const { editor, rotate, flip, palette: paletteData } = JSON.parse(data);
-
-        pixels.setState(editor);
-        palette.setState(paletteData);
-        pixels.setupColorPicker();
-
-        document.getElementById("rotate").checked = !!rotate;
-        document.getElementById("flip").checked = !!flip;
+        pixels.loadCreation(creation);
         window.history.pushState(null, "", `?creation=${creation.id}`);
         event.preventDefault();
       });
