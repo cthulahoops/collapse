@@ -145,10 +145,6 @@ function displayOutput(context, wave, tiles, palette) {
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       context.fillStyle = wave[i * gridSize + j].displayColor(palette, tiles);
-      // if (wave[i * gridSize + j].entropy() === 1) {
-      //   context.strokeStyle = 'blue'
-      //   context.strokeRect(j * 30, i * 30, 29, 29)
-      // }
       context.fillRect(j * 15, i * 15, 14, 14);
     }
   }
