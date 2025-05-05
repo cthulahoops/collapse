@@ -64,12 +64,7 @@ function main() {
   addPondiverseButton(() => {
     const creation = {
       type: "collapse",
-      data: JSON.stringify({
-        editor: editor.toPixelString(),
-        palette: editor.palette.toJSON(),
-        rotate: document.getElementById("rotate").checked,
-        flip: document.getElementById("flip").checked,
-      }),
+      data: editor.saveJSON(),
       image: getScreenshot(),
     };
     console.log(creation);

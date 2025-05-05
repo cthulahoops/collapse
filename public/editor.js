@@ -186,7 +186,12 @@ export class PixelEditor {
   }
 
   setState(pixelString) {
-    const lines = pixelString.split("\n");
+    let lines;
+    if (typeof pixelString === "string") {
+      lines = pixelString.split("\n");
+    } else if (Array.isArray(pixelString)) {
+      lines = pixelString;
+    }
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
         this.pixels[i][j] = lines[i]?.[j] || " ";
@@ -195,12 +200,17 @@ export class PixelEditor {
     this.display();
   }
 
-  toPixelString() {
-    return this.pixels.map((row) => row.join("")).join("\n");
-  }
-
   lines() {
     return this.pixels.map((row) => row.join(""));
+  }
+
+  saveJSON() {
+    return JSON.stringify({
+      editor: this.lines(),
+      palette: this.palette.toJSON(),
+      rotate: document.getElementById("rotate").checked,
+      flip: document.getElementById("flip").checked,
+    });
   }
 
   loadCreation({ data }) {
